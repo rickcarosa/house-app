@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   collection,
   getDocs,
@@ -12,9 +13,11 @@ import { toast } from 'react-toastify';
 import Spinner from '../components/Spinner';
 import ListingItem from '../components/ListingItem';
 
-const Offers = () => {
+const Category = () => {
   const [listings, setListings] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const params = useParams();
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -25,7 +28,7 @@ const Offers = () => {
         // create a query
         const q = query(
           listingsRef,
-          where('offer', '==', true),
+          where('type', '==', params.categoryName),
           orderBy('timestamp', 'desc'),
           limit(10)
         );
@@ -49,13 +52,16 @@ const Offers = () => {
       }
     };
     fetchListings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params.categoryName]);
 
   return (
     <div className='category'>
       <header>
-        <p className='pageHeader'>Offers</p>
+        <p className='pageHeader'>
+          {params.categoryName === 'rent'
+            ? 'Places for rent'
+            : 'Places for sale'}
+        </p>
       </header>
 
       {loading ? (
@@ -75,10 +81,10 @@ const Offers = () => {
           </main>
         </>
       ) : (
-        <p>There are no current offers.</p>
+        <p>No listings for {params.categoryName}</p>
       )}
     </div>
   );
 };
 
-export default Offers;
+export default Category;
